@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx" 
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
+	http://www.springframework.org/schema/data/jpa 
+	http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+
+	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<!-- 数据源 -->
+		<property name="dataSource" ref="dataSource" />
+		<!-- 实体类路径 -->
+		<property name="packagesToScan" value="com.ssmvue.entity"></property>
+		
+		 <!-- 指定JPA属性；如Hibernate中指定是否显示SQL的是否显示、方言等 -->
+         <property name="jpaVendorAdapter">
+             <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+                 <!-- 是否生成ddl文件 -->
+                 <property name="generateDdl" value="true" />
+                 <!-- 是否展示sql -->
+                 <property name="showSql" value="true" />
+                 <!-- 必要的数据库库使用的详细信息 -->
+                 <property name="databasePlatform" value="org.hibernate.dialect.MySQLDialect" />
+                 <!-- mysql,自行选择 -->
+                 <property name="database" value="MYSQL"/>
+             </bean>
+         </property>
+         <!--  <property name="jpaProperties">
+             <props>
+                 <prop key="hibernate.ejb.naming_strategy">org.hibernate.cfg.ImprovedNamingStrategy</prop>
+                 <prop key="hibernate.hbm2ddl.auto">update</prop>
+             </props>
+         </property>-->
+	</bean>
+	
+	<jpa:repositories base-package="com.ssmvue.dao" entity-manager-factory-ref="entityManagerFactory"></jpa:repositories>
+	
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+    	<property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+	
+	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
+</beans>

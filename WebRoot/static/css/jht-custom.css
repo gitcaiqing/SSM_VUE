@@ -1,0 +1,13 @@
+.el-menu-vertical-demo:not(.el-menu--collapse) {
+    width: 200px;
+    min-height: 400px;
+}
+.el-menu--horizontal>.el-menu-item.is-active, .el-menu--horizontal>.el-submenu.is-active .el-submenu__title {
+    border-bottom: 0px solid #409EFF;
+    color: #303133;
+}
+
+.headimg-tooltip {
+	padding:5px;
+	margin:0px;
+}
