@@ -24,6 +24,7 @@
             v-bind:style="{height: wheight - 100 + 'px'}"
             background-color="#545c64"
             text-color="#fff"
+            @select="menuItemClick"
             <%--active-text-color="#ffd04b"
             :default-active="initPaht"
             @select="menuItemClick"
@@ -33,12 +34,12 @@
         <el-submenu index="0">
             <template slot="title">
                 <i class="el-icon-menu"></i>
-                <span>父菜单</span>
+                <span>基础信息</span>
             </template>
-            <el-menu-item index="${base}/demo/demo.jsp">
+            <el-menu-item index="${base}/a/user/list">
                 <template>
                     <i class="el-icon-caret-right"></i>
-                    <span>子菜单</span>
+                    <span>用户管理</span>
                 </template>
             </el-menu-item>
         </el-submenu>
@@ -48,7 +49,7 @@
                 <i class="el-icon-menu"></i>
                 <span>父菜单</span>
             </template>
-            <el-menu-item index="${base}/demo/demo.jsp">
+            <el-menu-item index="${base}/demo/demo1.jsp">
                 <template>
                     <i class="el-icon-caret-right"></i>
                     <span>子菜单</span>
@@ -61,7 +62,7 @@
             <i class="el-icon-menu"></i>
             <span>父菜单</span>
         </template>
-        <el-menu-item index="${base}/demo/demo.jsp">
+        <el-menu-item index="${base}/demo/demo2.jsp">
             <template>
                 <i class="el-icon-caret-right"></i>
                 <span>子菜单</span>

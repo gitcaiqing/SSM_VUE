@@ -64,7 +64,7 @@ Vue = function(options) {
       	window.location.href = index;
     };
     methods.toIndex = function() {
-    	  window.location.href = base + "/a/home.jsp";
+    	  window.location.href = base + "/a/home";
     };
     
     methods.accountset = function() {
