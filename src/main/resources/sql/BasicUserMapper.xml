@@ -196,4 +196,31 @@
       upddate = #{upddate,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <sql id="listpageCommonSql">
+    <if test="basicUser.username != null">
+      AND username LIKE CONCAT('%',#{basicUser.username},'%')
+    </if>
+    <if test="basicUser.sex != null">
+      AND sex = #{basicUser.sex}
+    </if>
+  </sql>
+  <!--获取总数-->
+  <select id="countBasicUser" resultType="int">
+    SELECT COUNT(id)
+    FROM  tb_basic_user
+    WHERE 1=1
+   <include refid="listpageCommonSql"/>
+  </select>
+  <select id="listBasicUser" resultMap="BaseResultMap">
+    SELECT  <include refid="Base_Column_List"/>
+    FROM tb_basic_user
+    WHERE  1=1
+    <include refid="listpageCommonSql"/>
+    <if test="page.sort != null and page.direction != null">
+      ORDER BY #{page.sort} #{page.direction}
+    </if>
+    LIMIT #{page.start},#{page.pageSize}
+
+  </select>
 </mapper>

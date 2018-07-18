@@ -57,10 +57,10 @@
 
 
                                 <el-form-item>
-                                    <el-button icon="el-icon-search" type="primary" >查询</el-button>
+                                    <el-button icon="el-icon-search" type="primary" @click="onSearch()">查询</el-button>
                                 </el-form-item>
                                 <el-form-item>
-                                    <el-button icon="el-icon-plus" type="primary" >新增</el-button>
+                                    <el-button icon="el-icon-plus" type="primary" @click="onEdit()">新增</el-button>
                                 </el-form-item>
                             </el-form>
                         </div>
@@ -77,7 +77,13 @@
 
                                 <el-table-column prop="realname" label="真实姓名" align="center"></el-table-column>
 
-                                <el-table-column prop="sex" label="性别" align="center"></el-table-column>
+                                <el-table-column prop="sex" label="性别" align="center">
+                                    <template slot-scope="scope">
+                                        <el-tag type="success" v-if="scope.row.sex == 1">男</el-tag>
+                                        <el-tag type="danger" v-else-if="scope.row.sex == 0">女</el-tag>
+                                        <el-tag type="warning" v-else>--</el-tag>
+                                    </template>
+                                </el-table-column>
 
                                 <el-table-column prop="age" label="年龄" align="center"></el-table-column>
 
@@ -85,11 +91,19 @@
 
                                 <el-table-column prop="credate" label="创建时间" align="center"></el-table-column>
 
+                                <el-table-column prop="sex" label="状态" align="center">
+                                    <template slot-scope="scope">
+                                        <el-tag type="success" v-if="scope.row.status == 1">启用</el-tag>
+                                        <el-tag type="danger" v-else-if="scope.row.status == 0">禁用</el-tag>
+                                        <el-tag type="warning" v-else>--</el-tag>
+                                    </template>
+                                </el-table-column>
+
                                 <el-table-column fixed="right" label="操作" align="center" width="250">
                                     <template slot-scope="scope">
-                                        <el-button @click="onView(scope.row.userId)" type="text" size="small" icon="el-icon-view">详细</el-button>
-                                        <el-button @click="onAdd(scope.row.userId)" type="text" size="small" icon="el-icon-edit">编辑</el-button>
-                                        <el-button @click="onDelete(scope.row.userId)" type="text" size="small" icon="el-icon-delete">删除</el-button>
+                                        <el-button @click="onView(scope.row.id)" type="text" size="small" icon="el-icon-view">详细</el-button>
+                                        <el-button @click="onEdit(scope.row.id)" type="text" size="small" icon="el-icon-edit">编辑</el-button>
+                                        <el-button @click="onDelete(scope.row.id)" type="text" size="small" icon="el-icon-delete">删除</el-button>
                                     </template>
                                 </el-table-column>
                             </el-table>
@@ -99,8 +113,8 @@
                         <%--分页start--%>
                         <div class="block" style="margin-top:20px">
                             <el-pagination
-                                    <%--@current-change="handlePageChange"
-                                    @size-change="handleSizeChange"--%>
+                                    @size-change="handleSizeChange"
+                                    @current-change="handleCurrentChange"
                                     :current-page="datas.page.pageNo"
                                     :page-sizes="[10, 15, 25, 50]"
                                     :page-size="datas.page.pageSize"
@@ -117,6 +131,19 @@
             </el-main>
         </el-container>
     </el-container>
+
+    <%--详细弹框页start--%>
+    <%@include file="basicUserDetail.jsp"%>
+    <%--详细弹框页end--%>
+
+    <%--详细弹框页start--%>
+    <%@include file="basicUserAddOrUpdate.jsp"%>
+    <%--详细弹框页end--%>
+    
+    <!--编辑动态元素弹框start-->
+    <%--<%@ include file="/a/codepool/apply.jsp"%>--%>
+    <!-- 编辑动态元素弹框end -->
+    
 </div>
 
 
@@ -125,13 +152,29 @@
     new Vue({
         el: '#app',
         data: {
+            //详细页弹框
+            detailDialogFormVisible:false,
+            //新增或修改页弹框
+            editDialogFormVisible:false,
+            editTitle:'新增用户',
+            dialogformLabelWidth:'120px',
             //列表页搜索条件
             formSearch: {
                 username:null,
                 sex: null,
             },
+
+            detailForm:{
+                username:"君奉天"
+            },
+            editForm:{
+                username:"君奉天"
+            },
             datas:{
                 options: [{
+                    value: null,
+                    label: '请选择性别'
+                },{
                     value: '0',
                     label: '女'
                 }, {
@@ -143,25 +186,83 @@
                     pageSize: 10,
                     pageNo: 1
                 },
-                tableData:[{
-                    id:"1",
-                    username:"君奉天",
-                    sex:"1",
-                    age:11
-                },{
-                    id:"2",
-                    username:"墨倾池",
-                    age:12
-                },{
-                    id:"3",
-                    username:"邃无端",
-                    age:13
-                }],
-
+                tableData:[{}],
             },
         },
+        mounted:function(){
+            var that = this;
+            //调用获取列表数据的方法
+            that.listBasicuser(that.datas.page.pageNo, that.datas.page.pageSize);
+        },
         methods: {
+            onSearch:function(){
+                var that = this;
+                that.listBasicuser(that.datas.page.pageNo, that.datas.page.pageSize);
+            },
+            //页面记录数更改
+            handleSizeChange:function (pageSize) {
+                console.log("每页记录数："+pageSize);
+                var that = this;
+                that.listBasicuser(that.datas.page.pageNo, pageSize)
+            },
+            //点击页码当前页更改
+            handleCurrentChange:function (pageNo) {
+                console.log("当前页:"+pageNo);
+                var that = this;
+                that.listBasicuser(pageNo, that.datas.page.pageSize)
+            },
+            listBasicuser:function (pageNo, pageSize) {
+                var that = this;
+                axios.get('${base}/a/user/users',{
+                    params:{
+                        'pageNo':pageNo, 'pageSize':pageSize,
+                        'username':this.formSearch.username, 'sex':this.formSearch.sex
+                    },
+                }).then(function(response){
+                    console.log('response:'+response);
+                    var _data = response.data;
+                    that.datas.tableData = _data.list;
+                    that.datas.page.totalRows = _data.totalRows;
 
+                }).catch(function (error) {
+                    console.log('error:'+error);
+                    that.$message({
+                        message: '系统服务繁忙，请稍后重试！',
+                        type: 'warning'
+                    });
+                });
+
+            },
+            //详细
+            onView:function(id){
+                var that = this;
+                that.detailDialogFormVisible = true;
+            },
+            //新增编辑
+            onEdit:function(id){
+                var that = this;
+                that.editDialogFormVisible = true;
+                if(id != null){
+                    that.editTitle = "编辑用户";
+                }
+            },
+            onDelete:function(){
+                this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(function() {
+                    this.$message({
+                    type: 'success',
+                    message: '删除成功!'
+                    });
+                }).catch(function() {
+                        this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
+            }
         }
     })
 </script>

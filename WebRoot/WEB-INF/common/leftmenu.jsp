@@ -36,7 +36,7 @@
                 <i class="el-icon-menu"></i>
                 <span>基础信息</span>
             </template>
-            <el-menu-item index="${base}/a/user/list">
+            <el-menu-item index="${base}/a/user/tolist">
                 <template>
                     <i class="el-icon-caret-right"></i>
                     <span>用户管理</span>
