@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssmvue.mapper.BasicUserMapper" >
+  <resultMap id="BaseResultMap" type="com.ssmvue.entity.BasicUser" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="userId" property="userid" jdbcType="VARCHAR" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="headimg" property="headimg" jdbcType="VARCHAR" />
+    <result column="realname" property="realname" jdbcType="VARCHAR" />
+    <result column="sex" property="sex" jdbcType="INTEGER" />
+    <result column="age" property="age" jdbcType="INTEGER" />
+    <result column="mobile" property="mobile" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="memo" property="memo" jdbcType="VARCHAR" />
+    <result column="credate" property="credate" jdbcType="TIMESTAMP" />
+    <result column="upddate" property="upddate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, userId, username, password, status, headimg, realname, sex, age, mobile, email, 
+    memo, credate, upddate
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_basic_user
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from tb_basic_user
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.ssmvue.entity.BasicUser" >
+    insert into tb_basic_user (id, userId, username, 
+      password, status, headimg, 
+      realname, sex, age, 
+      mobile, email, memo, 
+      credate, upddate)
+    values (#{id,jdbcType=INTEGER}, #{userid,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR}, 
+      #{password,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{headimg,jdbcType=VARCHAR}, 
+      #{realname,jdbcType=VARCHAR}, #{sex,jdbcType=INTEGER}, #{age,jdbcType=INTEGER}, 
+      #{mobile,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{memo,jdbcType=VARCHAR}, 
+      #{credate,jdbcType=TIMESTAMP}, #{upddate,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ssmvue.entity.BasicUser" >
+    insert into tb_basic_user
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="userid != null" >
+        userId,
+      </if>
+      <if test="username != null" >
+        username,
+      </if>
+      <if test="password != null" >
+        password,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="headimg != null" >
+        headimg,
+      </if>
+      <if test="realname != null" >
+        realname,
+      </if>
+      <if test="sex != null" >
+        sex,
+      </if>
+      <if test="age != null" >
+        age,
+      </if>
+      <if test="mobile != null" >
+        mobile,
+      </if>
+      <if test="email != null" >
+        email,
+      </if>
+      <if test="memo != null" >
+        memo,
+      </if>
+      <if test="credate != null" >
+        credate,
+      </if>
+      <if test="upddate != null" >
+        upddate,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userid != null" >
+        #{userid,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null" >
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="headimg != null" >
+        #{headimg,jdbcType=VARCHAR},
+      </if>
+      <if test="realname != null" >
+        #{realname,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        #{sex,jdbcType=INTEGER},
+      </if>
+      <if test="age != null" >
+        #{age,jdbcType=INTEGER},
+      </if>
+      <if test="mobile != null" >
+        #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="memo != null" >
+        #{memo,jdbcType=VARCHAR},
+      </if>
+      <if test="credate != null" >
+        #{credate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="upddate != null" >
+        #{upddate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ssmvue.entity.BasicUser" >
+    update tb_basic_user
+    <set >
+      <if test="userid != null" >
+        userId = #{userid,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null" >
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="headimg != null" >
+        headimg = #{headimg,jdbcType=VARCHAR},
+      </if>
+      <if test="realname != null" >
+        realname = #{realname,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        sex = #{sex,jdbcType=INTEGER},
+      </if>
+      <if test="age != null" >
+        age = #{age,jdbcType=INTEGER},
+      </if>
+      <if test="mobile != null" >
+        mobile = #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="memo != null" >
+        memo = #{memo,jdbcType=VARCHAR},
+      </if>
+      <if test="credate != null" >
+        credate = #{credate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="upddate != null" >
+        upddate = #{upddate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ssmvue.entity.BasicUser" >
+    update tb_basic_user
+    set userId = #{userid,jdbcType=VARCHAR},
+      username = #{username,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      headimg = #{headimg,jdbcType=VARCHAR},
+      realname = #{realname,jdbcType=VARCHAR},
+      sex = #{sex,jdbcType=INTEGER},
+      age = #{age,jdbcType=INTEGER},
+      mobile = #{mobile,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
+      memo = #{memo,jdbcType=VARCHAR},
+      credate = #{credate,jdbcType=TIMESTAMP},
+      upddate = #{upddate,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
