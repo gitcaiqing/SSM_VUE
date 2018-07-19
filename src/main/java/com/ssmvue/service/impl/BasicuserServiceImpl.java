@@ -1,5 +1,6 @@
 package com.ssmvue.service.impl;
 
+import com.ssmvue.common.JSONResult;
 import com.ssmvue.common.VuePager;
 import com.ssmvue.entity.BasicUser;
 import com.ssmvue.mapper.BasicUserMapper;
@@ -10,7 +11,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -22,23 +28,12 @@ public class BasicuserServiceImpl implements BasicUserService{
 	@Autowired
 	private BasicUserMapper basicUserMapper;
 
-	@Override
-	public Integer add() {
-		BasicUser basicUser = new BasicUser();
-		basicUser.setUserid(UUIDUtil.getUUUID());
-		basicUser.setUsername("hongchenxue");
-		basicUser.setPassword(MD5Util.MD5("123456"));
-		basicUser.setAge(18);
-		basicUser.setMobile("18779681526");
-		basicUser.setEmail("380120634@qq.com");
-		basicUser.setRealname("红尘雪");
-		basicUser.setMemo("红尘雪红尘雪红尘雪红尘雪");
-		basicUser.setCredate(new Date());
-		basicUser.setStatus(1);
-		basicUser.setSex(0);
-		return basicUserMapper.insertSelective(basicUser);
-	}
-
+	/**
+	 * 列表数据
+	 * @param page
+	 * @param basicUser
+	 * @return
+	 */
 	@Override
 	public VuePager<BasicUser> listPage(VuePager<BasicUser> page, BasicUser basicUser) {
 		int count = basicUserMapper.countBasicUser(basicUser);
@@ -54,5 +49,91 @@ public class BasicuserServiceImpl implements BasicUserService{
 		log.info("用户管理列表数据："+page);
 		return page;
 	}
+
+	/**
+	 * 根据id获取用户信息
+	 * @param id
+	 * @return
+	 */
+    @Override
+    public BasicUser findBasicUserById(Integer id) {
+        return basicUserMapper.selectByPrimaryKey(id);
+    }
+
+	/**
+	 *  根据id删除用户信息
+	 * @param id
+	 * @return
+	 */
+	@Override
+	public JSONResult deleteBasicUserById(Integer id) {
+		int effrow = basicUserMapper.deleteByPrimaryKey(id);
+		if(effrow > 0){
+			return new JSONResult(true, "删除成功");
+		}
+		return new JSONResult(false, "删除失败");
+	}
+
+	/**
+	 * 新增用户
+	 * @param basicUser
+	 * @return
+	 */
+	@Override
+	public JSONResult addBasicUser(BasicUser basicUser) {
+		basicUser.setUserid(UUIDUtil.getUUUID());
+		basicUser.setPassword(MD5Util.MD5(basicUser.getPassword()));
+		Date now = new Date();
+		basicUser.setCredate(now);
+		basicUser.setUpddate(now);
+		int effrow = basicUserMapper.insertSelective(basicUser);
+		if(effrow > 0){
+			return new JSONResult(true, "新增成功");
+		}
+		return new JSONResult(false, "新增失败");
+	}
+
+	/**
+	 * 更新用户
+	 * @param basicUser
+	 * @return
+	 */
+	@Override
+	public JSONResult updateBasicUser(BasicUser basicUser) {
+		if(!StringUtils.isEmpty(basicUser.getPassword())) {
+			basicUser.setPassword(MD5Util.MD5(basicUser.getPassword()));
+		}
+		basicUser.setUpddate(new Date());
+		int effrow = basicUserMapper.updateByPrimaryKeySelective(basicUser);
+		if(effrow > 0){
+			return new JSONResult(true, "更新成功");
+		}
+		return new JSONResult(false, "更新失败");
+	}
+
+    /**
+	 * 上传文件
+	 * @param file
+	 * @return
+	 */
+    @Override
+    public JSONResult uploadfile(MultipartFile file, HttpServletRequest request) {
+        String path = "";
+		if(file!=null){
+		    //String contentext = request.getServletContext().getRealPath("/static/img");
+            String contentext = "/static/img/";
+            System.out.println(contentext);
+            path = path + contentext;
+            long time = new Date().getTime();
+            path=path+ time+"_"+file.getOriginalFilename();
+            //上传
+            try {
+                file.transferTo(new File(path));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return new JSONResult(true,"上传成功", path);
+    }
 
 }

@@ -12,9 +12,9 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-    <link rel="stylesheet" rel="stylesheet" href="${base}/static/css/jht-custom.css" />
-    <link rel="stylesheet" rel="stylesheet" href="${base}/static/iconfont/iconfont.css"/>
+    <%--<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">--%>
+    <%--<link rel="stylesheet" rel="stylesheet" href="${base}/static/css/custom.css" />--%>
+    <%--<link rel="stylesheet" rel="stylesheet" href="${base}/static/iconfont/iconfont.css"/>--%>
     <jsp:include page="/WEB-INF/common/common.jsp"/>
     <style>
         .member-count{

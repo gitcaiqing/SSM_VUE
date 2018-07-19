@@ -41,6 +41,16 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 	
+	<!--rest请求方式过滤器, PUT, DELETE 请求参数中需要有 _method = "PUT" 或 _method = "DELETE" -->
+	<filter>
+		<filter-name>HiddenHttpMethodFilter</filter-name>
+		<filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>HiddenHttpMethodFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
    <!--<servlet>
 	    <servlet-name>CaptchaServlet</servlet-name>
 	    <servlet-class>com.jht.tms.security.CaptchaServlet</servlet-class>

@@ -5,22 +5,22 @@
   Time: 15:10
   To change this template use File | Settings | File Templates.
 --%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
+
 <% String path = request.getContextPath();%>
 <script>
     var base = '<%=path%>'
 </script>
 <title>SSM后框架+VUE前端框架搭建管理系统</title>
 
-
 <link rel="stylesheet" href="<%=path%>/static/element-ui/index.css">
-<link rel="stylesheet" rel="stylesheet" href="<%=path%>/static/css/jht-custom.css" />
 <link rel="stylesheet" rel="stylesheet" href="<%=path%>/static/iconfont/iconfont.css"/>
+<link rel="stylesheet" rel="stylesheet" href="<%=path%>/static/css/custom.css" />
 
 <script src="<%=path%>/static/js/axios.min.js"></script>
 <script src="<%=path%>/static/js/vue.js"></script>

@@ -31,8 +31,8 @@
                     <%--导航start--%>
                     <el-breadcrumb separator-class="el-icon-arrow-right">
                         <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-                        <el-breadcrumb-item>用户管理</el-breadcrumb-item>
-                        <el-breadcrumb-item>用户列表</el-breadcrumb-item>
+                        <el-breadcrumb-item><a style="text-decoration: none" href="${base}/a/user/tolist">用户管理</a></el-breadcrumb-item>
+                        <el-breadcrumb-item><a style="text-decoration: none" href="${base}/a/user/tolist">用户列表</a></el-breadcrumb-item>
                     </el-breadcrumb>
                     <%--导航end--%>
 
@@ -73,7 +73,11 @@
 
                                 <el-table-column prop="username" label="用户名称" align="center"></el-table-column>
 
-                                <el-table-column prop="headimg" label="用户头像" align="center"></el-table-column>
+                                <el-table-column prop="headimg" label="用户头像" align="center">
+                                    <template slot-scope="scope">
+                                        <img v-bind:src="scope.row.headimg" style="width:45px;height:45px;border-radius: 5px;">
+                                    </template>
+                                </el-table-column>
 
                                 <el-table-column prop="realname" label="真实姓名" align="center"></el-table-column>
 
@@ -156,6 +160,7 @@
             detailDialogFormVisible:false,
             //新增或修改页弹框
             editDialogFormVisible:false,
+            detailDialogImgVisible:false,
             editTitle:'新增用户',
             dialogformLabelWidth:'120px',
             //列表页搜索条件
@@ -164,12 +169,8 @@
                 sex: null,
             },
 
-            detailForm:{
-                username:"君奉天"
-            },
-            editForm:{
-                username:"君奉天"
-            },
+            detailForm:{},
+            editForm:{},
             datas:{
                 options: [{
                     value: null,
@@ -231,39 +232,207 @@
                         type: 'warning'
                     });
                 });
-
             },
             //详细
             onView:function(id){
                 var that = this;
+                //获取用户信息
+                axios.get('${base}/a/user/'+id).then(function (response) {
+                    that.detailForm = response.data;
+                    var imgs = [];
+                    var imgmap = {};
+                    imgmap.name = 'head1';
+                    imgmap.url = response.data.headimg;
+                    imgs.push(imgmap);
+                    that.detailForm.headimgs = (imgs);
+                }).catch(function (error) {
+                    console.log('error:'+error);
+                    that.$message({
+                        message: '系统服务繁忙，请稍后重试！',
+                        type: 'warning'
+                    });
+                });
                 that.detailDialogFormVisible = true;
             },
             //新增编辑
             onEdit:function(id){
                 var that = this;
-                that.editDialogFormVisible = true;
                 if(id != null){
                     that.editTitle = "编辑用户";
+                    //获取用户信息
+                    axios.get('${base}/a/user/'+id).then(function (response) {
+                        that.editForm = response.data;
+                        that.editForm.credate = new Date(response.data.credate);
+                        that.editForm.upddate = new Date(response.data.upddate);
+
+                        //图片集合
+                        var imgs = [];
+                        var imgmap = {};
+                        imgmap.name = 'head1';
+                        imgmap.url = response.data.headimg;
+                        imgs.push(imgmap);
+                        that.detailForm.headimgs = imgs;
+
+                    }).catch(function (error) {
+                        console.log('error:'+error);
+                        that.$message({
+                            message: '系统服务繁忙，请稍后重试！',
+                            type: 'warning'
+                        });
+                    });
+                }else{
+                    that.editTitle = "新增用户";
+                    that.editForm.status = 1;
+                    that.editForm.sex = 0;
                 }
+                that.editDialogFormVisible = true;
             },
-            onDelete:function(){
-                this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+            onDelete:function(id){
+                var that = this;
+                that.$confirm('确定删除用户?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(function() {
-                    this.$message({
-                    type: 'success',
-                    message: '删除成功!'
+                    axios({
+                        method: 'post',
+                        url: base+"/a/user/"+id,
+                        data: { '_method': "DELETE"},
+                        transformRequest: [function (data) {
+                            var ret = ''
+                            for (var it in data) {ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'}
+                            return ret
+                        }],
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+                    }).then(function (response) {
+                        var issuccess = response.data.success;
+                        if(issuccess){
+                            that.$message({
+                                message: '删除成功！',
+                                type: 'success'
+                            });
+                            that.listBasicuser(that.datas.page.pageNo, that.datas.page.pageSize);
+                        }else{
+                            that.$message({
+                                message: '系统服务繁忙，请稍后重试！',
+                                type: 'warning'
+                            });
+                        }
+                    }).catch(function () {
+                        that.$message({
+                            message: '系统服务繁忙，请稍后重试！',
+                            type: 'warning'
+                        });
                     });
                 }).catch(function() {
-                        this.$message({
-                        type: 'info',
-                        message: '已取消删除'
+
+                });
+            },
+            //保存
+            onSave:function(){
+                var that = this;
+                var data = that.editForm;
+                //新增
+                if(!data.id){
+                    data._method = "PUT";
+                    //启用
+                    data.status = 1;
+                }
+                if(data.age){
+                    data.age = parseInt(data.age);
+                }else{
+                    data.age = null;
+                }
+
+                axios({
+                    method: 'post',
+                    url: base+"/a/user",
+                    data:data,
+                    transformRequest: [function (data) {
+                        var ret = ''
+                        for (var it in data) {ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'}
+                        return ret
+                    }],
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+                }).then(function (response) {
+                    var issuccess = response.data.success;
+                    if(issuccess){
+                        that.$message({
+                            message: '保存成功！',
+                            type: 'success'
+                        });
+                        that.editDialogFormVisible = false;
+                        that.listBasicuser(that.datas.page.pageNo, that.datas.page.pageSize);
+                    }else{
+                        that.$message({
+                            message: '系统服务繁忙，请稍后重试！',
+                            type: 'warning'
+                        });
+                    }
+                }).catch(function () {
+                    that.$message({
+                        message: '系统服务繁忙，请稍后重试！',
+                        type: 'warning'
                     });
                 });
+            },
+            //图片上传之前
+            handleBeforeImgUpload:function (file) {
+                console.log("file:"+file);
+                var that = this;
+                const isJPG = file.type === 'image/jpeg';
+                if(!isJPG){
+                    that.$message.error('上传头像图片只能是JPG格式！');
+                }
+                return isJPG;
+            },
+            //图片上传成功之后
+            handleSuccessImgUpload:function (res, file) {
+                //显示上传的图片
+                const imageUrl = res.content;
+                var that = this;
+                //图片集合
+                var imgs = [];
+                var imgmap = {};
+                imgmap.name = 'head1';
+                imgmap.url = imageUrl;
+                imgs.push(imgmap);
+                that.editForm.headimgs = imgs;
+                that.editForm.headimg = imageUrl;
+            },
+            handleExceed:function () {
+                this.$message.error('只能上传1张头像图片！');
             }
+
         }
     })
 </script>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

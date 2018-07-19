@@ -218,7 +218,7 @@
     WHERE  1=1
     <include refid="listpageCommonSql"/>
     <if test="page.sort != null and page.direction != null">
-      ORDER BY #{page.sort} #{page.direction}
+      ORDER BY ${page.sort} ${page.direction}
     </if>
     LIMIT #{page.start},#{page.pageSize}
 

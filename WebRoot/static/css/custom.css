@@ -1,3 +1,6 @@
+.el-aside, .el-main {
+    overflow: hidden !important;
+}
 .el-menu-vertical-demo:not(.el-menu--collapse) {
     width: 200px;
     min-height: 400px;
@@ -11,3 +14,4 @@
 	padding:5px;
 	margin:0px;
 }
+
