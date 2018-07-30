@@ -1,0 +1,8 @@
+1.文件上传tomcat虚拟路径配置
+intelij idea 配置
+    project structure: output directory: D:\softTool\apache-tomcat-7\apache-tomcat-7.0.64-7080\webapps\SSM_VUE
+tomcat server.xml: <host/> 节点配置文件虚拟路径
+    <Context path="/static/img" docBase="D:/softTool/apache-tomcat-7/apache-tomcat-7.0.64-7080/webapps/SSM_VUE/static\img"
+        reloadable="true" debug="0"></Context>
+
+2.
