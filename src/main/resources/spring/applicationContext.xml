@@ -13,7 +13,7 @@
 
 	<!--引入配置属性文件 -->
 	<context:property-placeholder location="classpath*:config/*.properties" />
-	
+
 	<context:component-scan base-package="com.ssmvue"></context:component-scan>
 	
 	

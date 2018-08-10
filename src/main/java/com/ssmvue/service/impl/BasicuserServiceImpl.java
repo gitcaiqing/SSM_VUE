@@ -16,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -118,22 +117,29 @@ public class BasicuserServiceImpl implements BasicUserService{
 	 */
     @Override
     public JSONResult uploadfile(MultipartFile file, HttpServletRequest request) {
-        String path = "";
+        String realpath = "/static/img/";
+		String filename = "";
 		if(file!=null){
-		    //String contentext = request.getServletContext().getRealPath("/static/img");
-            String contentext = "/static/img/";
-            System.out.println(contentext);
-            path = path + contentext;
+		    String uploadfile = request.getServletContext().getRealPath(realpath);
             long time = new Date().getTime();
-            path=path+ time+"_"+file.getOriginalFilename();
-            //上传
+			filename = time+"_"+file.getOriginalFilename();
+			uploadfile= uploadfile+"/"+ filename;
             try {
-                file.transferTo(new File(path));
-            } catch (IOException e) {
+            	//上传
+                file.transferTo(new File(uploadfile));
+				int a = 1/0;
+            } catch (Exception e) {
+            	log.error("上传文件异常："+e.getMessage());
                 e.printStackTrace();
+				throw new RuntimeException("上传失败，请重试！");
             }
         }
-        return new JSONResult(true,"上传成功", path);
+        return new JSONResult(true,"上传成功", realpath+filename);
     }
+
+	@Override
+	public List<BasicUser> listBasicUsers() {
+		return basicUserMapper.listBasicUser(new VuePager<BasicUser>(), new BasicUser());
+	}
 
 }

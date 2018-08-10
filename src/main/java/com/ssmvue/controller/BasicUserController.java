@@ -29,6 +29,7 @@ public class BasicUserController {
     @Autowired
     private BasicUserService basicUserService;
 
+
     /**
      * 进入用户管理列表页
      * @return
@@ -101,9 +102,21 @@ public class BasicUserController {
         return basicUserService.deleteBasicUserById(id);
     }
 
+    /**
+     * 文件上传  file.transferTo
+     * 在spring-mvc servlet 配置文件配置  multipartResolver, 详情servlet/spring-mvc.xml
+     * @param file
+     * @param request
+     * @return
+     */
     @RequestMapping(value = "/user/upload")
     @ResponseBody
     public JSONResult uploadfile(MultipartFile file, HttpServletRequest request){
-        return basicUserService.uploadfile(file, request);
+        try {
+            return basicUserService.uploadfile(file, request);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new JSONResult(false, e.getMessage());
+        }
     }
 }

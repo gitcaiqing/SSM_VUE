@@ -10,6 +10,7 @@ import com.ssmvue.entity.BasicUser;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * Created by CQ on 2018/7/18.
@@ -33,4 +34,8 @@ public interface BasicUserService {
 
     //上传文件
     JSONResult uploadfile(MultipartFile file, HttpServletRequest request);
+
+    //获取所有用户
+    List<BasicUser> listBasicUsers();
+
 }

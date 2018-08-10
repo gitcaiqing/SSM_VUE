@@ -75,7 +75,7 @@
 
                                 <el-table-column prop="headimg" label="用户头像" align="center">
                                     <template slot-scope="scope">
-                                        <img v-bind:src="scope.row.headimg" style="width:45px;height:45px;border-radius: 5px;">
+                                        <img v-bind:src="'${base}' + scope.row.headimg" style="width:45px;height:45px;border-radius: 5px;">
                                     </template>
                                 </el-table-column>
 
@@ -388,9 +388,15 @@
             },
             //图片上传成功之后
             handleSuccessImgUpload:function (res, file) {
+                var that = this;
+                if(!res.success){
+                    that.editForm.headimgs = [];
+                    that.editForm.headimg = "";
+                    this.$message.error(res.message);
+                    return;
+                }
                 //显示上传的图片
                 const imageUrl = res.content;
-                var that = this;
                 //图片集合
                 var imgs = [];
                 var imgmap = {};

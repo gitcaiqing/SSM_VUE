@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
-  <artifact type="exploded-war" name="SSM_VUE:war exploded">
-    <output-path>$PROJECT_DIR$/out/artifacts/SSM_VUE_war_exploded</output-path>
+  <artifact type="exploded-war" build-on-make="true" name="SSM_VUE:war exploded">
+    <output-path>D:/softTool/apache-tomcat-7/apache-tomcat-7.0.64-7080/webapps/SSM_VUE</output-path>
     <root id="root">
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">
