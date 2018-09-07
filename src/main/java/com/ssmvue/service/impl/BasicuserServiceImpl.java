@@ -142,4 +142,9 @@ public class BasicuserServiceImpl implements BasicUserService{
 		return basicUserMapper.listBasicUser(new VuePager<BasicUser>(), new BasicUser());
 	}
 
+	@Override
+	public BasicUser findByUsername(String username) {
+		return basicUserMapper.selectByUsername(username);
+	}
+
 }

@@ -38,4 +38,7 @@ public interface BasicUserService {
     //获取所有用户
     List<BasicUser> listBasicUsers();
 
+    //根据用户名获取
+    BasicUser findByUsername(String username);
+
 }

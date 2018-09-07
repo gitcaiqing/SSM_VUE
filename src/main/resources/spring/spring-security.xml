@@ -1,0 +1,106 @@
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+    http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.0.xsd">
+
+    <!--
+    如果use-expressns="true"时，则表示改为 SpEL 表达式。 SpEL 允许使用特定的访问控制规则表达式语言。与简单的字符串如 ROLE_USER 不同，
+    配置文件可以指明表达式语言触发方法调用、引用系统属性、计算机值等等。http标签中的配置改为如下
+    -->
+    <http auto-config="true" use-expressions="true">
+        <!--登陆页面，允许匿名访问 也可以<http pattern="/login.jsp" security="none"></http> 如此配置-->
+
+        <intercept-url pattern="/login.jsp" access="permitAll"></intercept-url>
+        <!--允许所有人访问-->
+        <intercept-url pattern="/" access="permitAll" />
+        <intercept-url pattern="/druid**" access="permitAll" />
+        <intercept-url pattern="/home" access="permitAll" />
+        <!--需要管理员权限-->
+        <intercept-url pattern="/admin**" access="hasRole('ROLE_ADMIN')" />
+        <intercept-url pattern="/dba**" access="hasRole('ROLE_USER') and hasRole('ROLE_DBA')" />
+        <!--配置自定义登陆页
+            form-login这个标签是配置登陆页面的，其中的属性login-page是配置登陆页面的，
+            default-target-url配置登陆成功后跳转到的页面，
+            authentication-failure-url配置认证失败后的跳转页面。
+            form-login标签中还有一个特别要注意的属性use-expressions，如果设置为true，
+            这配置access就要做相应的改变，否则项目启动的时候会报错。
+            如果use-expressns="true"时，则表示改为 SpEL 表达式。 SpEL 允许使用特定的访问控制规则表达式语言。
+            与简单的字符串如 ROLE_USER 不同，配置文件可以指明表达式语言触发方法调用、引用系统属性、计算机值等等。
+            如 ：<intercept-url pattern="/login.jsp" access="permitAll" />
+        -->
+        <!--<form-login  authentication-failure-url="/Access_Denied" />-->
+       <form-login login-page="/login.jsp" default-target-url="/a/home" always-use-default-target="false"
+            authentication-failure-url="/login.jsp?error=true"
+            username-parameter="username" password-parameter="password" login-processing-url="/login"/>
+        <!--
+            logout这个标签用来配置退出或者注销，其中的属性invalidate-session，
+            配置否是要清除session，logout-success-url配置注销成功后的跳转页面，
+            logout-url提交退出或者注销的地址，因此我们在配置退出或者注销的时候，
+            只需要将url设置为/j_spring_security_logout即可，这个地址也是security内部实现了的。
+        -->
+        <logout invalidate-session="true" logout-success-url="/login.jsp" logout-url="/j_spring_security_check"></logout>
+
+        <!--将CSRF保护功能禁用,设置为true即为禁用-->
+        <csrf disabled="true"/>
+        <!--或者可自定义matcher 过滤部分url-->
+        <!--<csrf request-matcher-ref="csrfSecurityRequestMatcher"></csrf>-->
+
+        <!-- max-sessions只容许一个账号登录，
+            error-if-maximum-exceeded 后面账号登录后踢出前一个账号，
+            expired-url session过期跳转界面
+                  如果concurrency-control标签配置了error-if-maximum-exceeded="true"，max-sessions="1"，
+                  那么第二次登录时，是登录不了的。
+                  如果error-if-maximum-exceeded="false"，
+                  那么第二次是能够登录到系统的，但是第一个登录的账号再次发起请求时，会跳转到expired-url配置的url中-->
+        <session-management session-authentication-error-url="/login.jsp">
+            <concurrency-control max-sessions="1" expired-url="/login.jsp"
+                error-if-maximum-exceeded="false" session-registry-ref="sessionRegistry"></concurrency-control>
+        </session-management>
+
+        <expression-handler ref="webexpressionHandler"></expression-handler>
+    </http>
+
+
+    <!--这里添加了一个属性execludeUrls，允许人为排除哪些url。
+    这里约定所有/rest/开头的都是Rest服务地址，上面的配置就把/rest/排除在csrf验证的范围之外了.
+    源码可以发现，POST方法被排除在外了，也就是说只有GET|HEAD|TRACE|OPTIONS这4类方法会被放行，
+    其它Method的http请求，都要验证_csrf的token是否正确，
+    而通常post方式调用rest服务时，又没有_csrf的token，所以校验失败。
+    解决方法：自己弄一个Matcher-->
+    <!--<beans:bean id="csrfSecurityRequestMatcher" class="com.ssmvue.security.CsrfSecurityRequestMatcher">
+        <beans:property name="execludeUrls">
+            <beans:list>
+                <beans:value>/rest/</beans:value>
+                <beans:value>/a/</beans:value>
+            </beans:list>
+        </beans:property>
+    </beans:bean>-->
+
+    <beans:bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl"></beans:bean>
+
+    <!--配置web端使用权限控制-->
+    <beans:bean id="webexpressionHandler" class="org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler"/>
+
+    <!--配置文件手动配置权限信息，实际开发中需要从数据库中获取-->
+    <!--<authentication-manager >
+        <authentication-provider>
+            <user-service>
+                <user name="admin" password="admin" authorities="ROLE_ADMIN" />
+                <user name="user" password="user" authorities="ROLE_USER" />
+                <user name="dba"   password="root123" authorities="ROLE_ADMIN,ROLE_DBA" />
+            </user-service>
+        </authentication-provider>
+    </authentication-manager>-->
+    <!--配置数据源获取权限信息, 在数据库中需要对应的用户和权限信息表-->
+    <authentication-manager>
+        <authentication-provider>
+            <!--获取spring security 需要的用户权限信息-->
+            <jdbc-user-service data-source-ref="dataSource"
+                users-by-username-query="SELECT username, password, IF(status is null, 1, 0) AS enabled FROM tb_basic_user WHERE username = ?"
+                authorities-by-username-query="SELECT U.username,A.authority from tb_basic_user U LEFT JOIN tb_basic_authorities A ON U.username = A.username WHERE U.username = ?"/>
+        </authentication-provider>
+    </authentication-manager>
+
+
+</beans:beans>

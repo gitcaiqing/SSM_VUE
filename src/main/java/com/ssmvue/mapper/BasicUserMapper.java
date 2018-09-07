@@ -55,4 +55,11 @@ public interface BasicUserMapper {
      * @return
      */
     List<BasicUser> listBasicUser(@Param("page") VuePager<BasicUser> page, @Param("basicUser")BasicUser basicUser);
+
+    /**
+     * 根据用户名获取
+     * @param username
+     * @return
+     */
+    BasicUser selectByUsername(String username);
 }

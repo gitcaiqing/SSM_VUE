@@ -47,12 +47,12 @@
         <el-submenu index="1">
             <template slot="title">
                 <i class="el-icon-menu"></i>
-                <span>父菜单</span>
+                <span>SQL监控</span>
             </template>
-            <el-menu-item index="${base}/demo/demo1.jsp">
+            <el-menu-item index="${base}/druid/index.html">
                 <template>
                     <i class="el-icon-caret-right"></i>
-                    <span>子菜单</span>
+                    <span>Druid监控</span>
                 </template>
             </el-menu-item>
         </el-submenu>
