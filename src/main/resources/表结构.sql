@@ -14,3 +14,4 @@ CREATE TABLE `tb_basic_user` (
   `credate` datetime DEFAULT NULL,
   `upddate` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
+);
