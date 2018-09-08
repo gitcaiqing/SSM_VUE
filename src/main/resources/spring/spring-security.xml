@@ -92,13 +92,28 @@
             </user-service>
         </authentication-provider>
     </authentication-manager>-->
-    <!--配置数据源获取权限信息, 在数据库中需要对应的用户和权限信息表-->
+    <!--配置数据源获取权限信息, 在数据库中需要对应的用户和权限信息表
+SELECT username, password, IF(status is null, 1, 0) AS enabled FROM tb_basic_user WHERE username = ?
+SELECT U.username,A.authority from tb_basic_user U LEFT JOIN tb_basic_authorities A ON U.username = A.username WHERE U.username = ?
+
+SELECT U.username, R.rolelabel FROM tb_basic_role R
+LEFT JOIN tb_basic_userrole UR ON UR.roleid = R.id
+JOIN tb_basic_user U ON U.id = UR.userid
+WHERE U.username = 'ADMIN'
+    -->
     <authentication-manager>
         <authentication-provider>
             <!--获取spring security 需要的用户权限信息-->
             <jdbc-user-service data-source-ref="dataSource"
-                users-by-username-query="SELECT username, password, IF(status is null, 1, 0) AS enabled FROM tb_basic_user WHERE username = ?"
-                authorities-by-username-query="SELECT U.username,A.authority from tb_basic_user U LEFT JOIN tb_basic_authorities A ON U.username = A.username WHERE U.username = ?"/>
+                users-by-username-query="SELECT username, password, IF(status is null, 1, 0) AS enabled
+                                         FROM tb_basic_user WHERE username = ?"
+
+                authorities-by-username-query="SELECT U.username, R.rolelabel FROM tb_basic_role R
+                                               LEFT JOIN tb_basic_userrole UR ON UR.roleid = R.id
+                                               JOIN tb_basic_user U ON U.id = UR.userid
+                                               WHERE U.username = ?"
+            />
+
         </authentication-provider>
     </authentication-manager>
 
