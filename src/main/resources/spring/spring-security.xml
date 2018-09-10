@@ -11,14 +11,17 @@
     <http auto-config="true" use-expressions="true">
         <!--登陆页面，允许匿名访问 也可以<http pattern="/login.jsp" security="none"></http> 如此配置-->
 
+        <!--通过数据库获取角色资源权限-->
+        <!--
         <intercept-url pattern="/login.jsp" access="permitAll"></intercept-url>
-        <!--允许所有人访问-->
+        &lt;!&ndash;允许所有人访问&ndash;&gt;
         <intercept-url pattern="/" access="permitAll" />
         <intercept-url pattern="/druid**" access="permitAll" />
         <intercept-url pattern="/home" access="permitAll" />
-        <!--需要管理员权限-->
+        &lt;!&ndash;需要管理员权限&ndash;&gt;
         <intercept-url pattern="/admin**" access="hasRole('ROLE_ADMIN')" />
-        <intercept-url pattern="/dba**" access="hasRole('ROLE_USER') and hasRole('ROLE_DBA')" />
+        <intercept-url pattern="/dba**" access="hasRole('ROLE_USER') and hasRole('ROLE_DBA')" />-->
+
         <!--配置自定义登陆页
             form-login这个标签是配置登陆页面的，其中的属性login-page是配置登陆页面的，
             default-target-url配置登陆成功后跳转到的页面，
@@ -40,6 +43,13 @@
             只需要将url设置为/j_spring_security_logout即可，这个地址也是security内部实现了的。
         -->
         <logout invalidate-session="true" logout-success-url="/login.jsp" logout-url="/j_spring_security_check"></logout>
+
+
+        <!--
+            配置自定义过滤器
+        -->
+        <custom-filter ref="filterSecurityInterceptor" before="FILTER_SECURITY_INTERCEPTOR"></custom-filter>
+
 
         <!--将CSRF保护功能禁用,设置为true即为禁用-->
         <csrf disabled="true"/>
@@ -82,6 +92,33 @@
     <!--配置web端使用权限控制-->
     <beans:bean id="webexpressionHandler" class="org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler"/>
 
+    <!--配置查询资源权限-->
+    <beans:bean id="builder" class="com.ssmvue.security.JdbcRequestMapBuilder">
+        <beans:property name="dataSource" ref="dataSource"></beans:property>
+        <beans:property name="resourceQuery"
+                        value="select A.authority,R.rolelabel
+                            from tb_basic_role R,tb_basic_authorities A,tb_basic_roleauthorities RA
+                            where R.id = RA.roleid AND A.id = RA.authorityid">
+        </beans:property>
+
+    </beans:bean>
+
+    <!---->
+    <beans:bean id="filterSecurityInterceptor"
+        class="org.springframework.security.web.access.intercept.FilterSecurityInterceptor">
+        <!-- 用户拥有的权限 -->
+        <beans:property name="accessDecisionManager" ref="accessDecisionManager" />
+        <!-- 用户是否拥有所请求资源的权限 -->
+        <beans:property name="authenticationManager" ref="authenticationManager" />
+        <!-- 资源与权限对应关系 -->
+        <beans:property name="securityMetadataSource" ref="securityMetadataSource" />
+
+    </beans:bean>
+
+    <!--授权管理器， 决定登陆的用户是否有权限访问资源-->
+    <beans:bean id="accessDecisionManager" class="com.ssmvue.security.MyAccessDecisionManager"></beans:bean>
+
+
     <!--配置文件手动配置权限信息，实际开发中需要从数据库中获取-->
     <!--<authentication-manager >
         <authentication-provider>
@@ -101,7 +138,8 @@ LEFT JOIN tb_basic_userrole UR ON UR.roleid = R.id
 JOIN tb_basic_user U ON U.id = UR.userid
 WHERE U.username = 'ADMIN'
     -->
-    <authentication-manager>
+    <!--用户是否拥有所请求的资源的权限，认证管理器-->
+    <authentication-manager alias="authenticationManager">
         <authentication-provider>
             <!--获取spring security 需要的用户权限信息-->
             <jdbc-user-service data-source-ref="dataSource"
@@ -117,5 +155,9 @@ WHERE U.username = 'ADMIN'
         </authentication-provider>
     </authentication-manager>
 
+    <!--资源权限关系-->
+    <beans:bean id="securityMetadataSource" class="com.ssmvue.security.MyFilterInvocationSecurityMetadataSource">
+        <beans:property name="builder" ref="builder"></beans:property>
+    </beans:bean>
 
 </beans:beans>
