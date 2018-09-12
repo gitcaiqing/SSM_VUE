@@ -45,10 +45,11 @@
         <logout invalidate-session="true" logout-success-url="/login.jsp" logout-url="/j_spring_security_check"></logout>
 
 
-        <!--
-            配置自定义过滤器
-        -->
+        <!-- 配置自定义过滤器 -->
+        <!--请求资源权限和用户资源权限过滤器， 从数据库获取-->
         <custom-filter ref="filterSecurityInterceptor" before="FILTER_SECURITY_INTERCEPTOR"></custom-filter>
+        <!--自定义登陆验证过滤器-->
+        <custom-filter ref="myUsernamePasswordAuthenticationFilter" before="FORM_LOGIN_FILTER"></custom-filter>
 
 
         <!--将CSRF保护功能禁用,设置为true即为禁用-->
@@ -70,6 +71,41 @@
 
         <expression-handler ref="webexpressionHandler"></expression-handler>
     </http>
+
+
+    <!-- 自定义filter处理登陆的验证及额外处理 -->
+    <beans:bean id="myUsernamePasswordAuthenticationFilter"
+                class="com.ssmvue.security.MyUsernamePasswordAuthenticationFilter">
+    <!--filterProcessesUrl属性为登陆的过滤的地址-->
+    <!--<beans:property name="filterProcessesUrl" value="/j_spring_security_check" />-->
+    <!--authenticationManager为authentication-manager标签中配置的-->
+    <beans:property name="authenticationManager" ref="authenticationManager" />
+    <!--authenticationSuccessHandler为验证成功后跳转的处理器-->
+    <beans:property name="authenticationSuccessHandler" ref="loginLogAuthenticationSuccessHandler" />
+    <!--authenticationFailureHandler为验证失败的处理器-->
+    <beans:property name="authenticationFailureHandler" ref="simpleUrlAuthenticationFailureHandler" />
+</beans:bean>
+
+
+    <!--<beans:bean id="myFilter" class="com.ssmvue.security.MyUsernamePasswordAuthenticationFilter">
+        <beans:property name="authenticationManager" ref="authenticationManager" />
+        &lt;!&ndash;调用登录认证成功后的处理 &ndash;&gt;
+        <beans:property name="authenticationSuccessHandler" ref="loginLogAuthenticationSuccessHandler" />
+        &lt;!&ndash;调用登录失败后的处理配置 &ndash;&gt;
+        <beans:property name="authenticationFailureHandler" ref="simpleUrlAuthenticationFailureHandler" />
+    </beans:bean>-->
+
+    <!--登录认证成功后的处理-->
+    <beans:bean id="loginLogAuthenticationSuccessHandler" class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
+        <beans:property name="defaultTargetUrl" value="/a/home" />
+    </beans:bean>
+    <!--登录失败后的处理配置-->
+    <beans:bean id="simpleUrlAuthenticationFailureHandler"
+          class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+        <beans:property name="defaultFailureUrl" value="/login.jsp" />
+    </beans:bean>
+
+
 
 
     <!--这里添加了一个属性execludeUrls，允许人为排除哪些url。
@@ -103,7 +139,7 @@
 
     </beans:bean>
 
-    <!---->
+    <!--请求资源权限和用户资源权限过滤器-->
     <beans:bean id="filterSecurityInterceptor"
         class="org.springframework.security.web.access.intercept.FilterSecurityInterceptor">
         <!-- 用户拥有的权限 -->
