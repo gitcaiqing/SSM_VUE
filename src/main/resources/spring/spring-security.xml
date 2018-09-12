@@ -42,7 +42,7 @@
             logout-url提交退出或者注销的地址，因此我们在配置退出或者注销的时候，
             只需要将url设置为/j_spring_security_logout即可，这个地址也是security内部实现了的。
         -->
-        <logout invalidate-session="true" logout-success-url="/login.jsp" logout-url="/j_spring_security_check"></logout>
+        <logout invalidate-session="true" logout-success-url="/login.jsp" logout-url="/logout"></logout>
 
 
         <!-- 配置自定义过滤器 -->
@@ -96,13 +96,15 @@
     </beans:bean>-->
 
     <!--登录认证成功后的处理-->
-    <beans:bean id="loginLogAuthenticationSuccessHandler" class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
+    <beans:bean id="loginLogAuthenticationSuccessHandler"
+                class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
         <beans:property name="defaultTargetUrl" value="/a/home" />
     </beans:bean>
     <!--登录失败后的处理配置-->
     <beans:bean id="simpleUrlAuthenticationFailureHandler"
-          class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+                class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler" >
         <beans:property name="defaultFailureUrl" value="/login.jsp" />
+        <beans:property name="useForward" value="true"></beans:property>
     </beans:bean>
 
 

@@ -96,6 +96,7 @@ public class CaptchaServlet extends HttpServlet{
 		 * 生成字符
 		 */
         String s = createCharacter(g);
+        System.out.println("Session Key:"+CaptchaServlet.CAPTCHA+",验证码："+s);
         request.getSession().setAttribute(CaptchaServlet.CAPTCHA, s);
 
         shear(g, w, h, new Color(255, 255, 255));
