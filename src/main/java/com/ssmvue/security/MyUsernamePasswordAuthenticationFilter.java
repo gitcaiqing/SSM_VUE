@@ -39,6 +39,8 @@ public class MyUsernamePasswordAuthenticationFilter extends UsernamePasswordAuth
             HttpSession session = request.getSession();
             String username = this.obtainUsername(request);
             String password = this.obtainPassword(request);
+            String paramValue = request.getParameter("remember-me");
+            System.out.println("rember value :"+paramValue);
             //用户输入的验证码
             String captcha = request.getParameter("captcha");
 
@@ -65,6 +67,7 @@ public class MyUsernamePasswordAuthenticationFilter extends UsernamePasswordAuth
             username = username.trim();
             UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username, password);
             this.setDetails(request, authRequest);
+            //this.setRememberMeServices();
             return this.getAuthenticationManager().authenticate(authRequest);
         }
     }

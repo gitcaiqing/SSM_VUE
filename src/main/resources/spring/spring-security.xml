@@ -8,7 +8,7 @@
     如果use-expressns="true"时，则表示改为 SpEL 表达式。 SpEL 允许使用特定的访问控制规则表达式语言。与简单的字符串如 ROLE_USER 不同，
     配置文件可以指明表达式语言触发方法调用、引用系统属性、计算机值等等。http标签中的配置改为如下
     -->
-    <http auto-config="true" use-expressions="true">
+    <http auto-config="false" use-expressions="true">
         <!--登陆页面，允许匿名访问 也可以<http pattern="/login.jsp" security="none"></http> 如此配置-->
 
         <!--通过数据库获取角色资源权限-->
@@ -50,7 +50,8 @@
         <custom-filter ref="filterSecurityInterceptor" before="FILTER_SECURITY_INTERCEPTOR"></custom-filter>
         <!--自定义登陆验证过滤器-->
         <custom-filter ref="myUsernamePasswordAuthenticationFilter" before="FORM_LOGIN_FILTER"></custom-filter>
-
+        <!--自定义rememberme过滤器-->
+        <custom-filter ref="rememberMeAuthenticationFilter" before="REMEMBER_ME_FILTER"></custom-filter>
 
         <!--将CSRF保护功能禁用,设置为true即为禁用-->
         <csrf disabled="true"/>
@@ -76,15 +77,16 @@
     <!-- 自定义filter处理登陆的验证及额外处理 -->
     <beans:bean id="myUsernamePasswordAuthenticationFilter"
                 class="com.ssmvue.security.MyUsernamePasswordAuthenticationFilter">
-    <!--filterProcessesUrl属性为登陆的过滤的地址-->
-    <!--<beans:property name="filterProcessesUrl" value="/j_spring_security_check" />-->
-    <!--authenticationManager为authentication-manager标签中配置的-->
-    <beans:property name="authenticationManager" ref="authenticationManager" />
-    <!--authenticationSuccessHandler为验证成功后跳转的处理器-->
-    <beans:property name="authenticationSuccessHandler" ref="loginLogAuthenticationSuccessHandler" />
-    <!--authenticationFailureHandler为验证失败的处理器-->
-    <beans:property name="authenticationFailureHandler" ref="simpleUrlAuthenticationFailureHandler" />
-</beans:bean>
+        <beans:property name="rememberMeServices" ref="rememberMeServices"></beans:property>
+        <!--filterProcessesUrl属性为登陆的过滤的地址-->
+        <!--<beans:property name="filterProcessesUrl" value="/login" />-->
+        <!--authenticationManager为authentication-manager标签中配置的-->
+        <beans:property name="authenticationManager" ref="authenticationManager" />
+        <!--authenticationSuccessHandler为验证成功后跳转的处理器-->
+        <beans:property name="authenticationSuccessHandler" ref="loginLogAuthenticationSuccessHandler" />
+        <!--authenticationFailureHandler为验证失败的处理器-->
+        <beans:property name="authenticationFailureHandler" ref="simpleUrlAuthenticationFailureHandler" />
+    </beans:bean>
 
 
     <!--<beans:bean id="myFilter" class="com.ssmvue.security.MyUsernamePasswordAuthenticationFilter">
@@ -178,8 +180,8 @@ WHERE U.username = 'ADMIN'
     -->
     <!--用户是否拥有所请求的资源的权限，认证管理器-->
     <authentication-manager alias="authenticationManager">
-        <authentication-provider>
-            <!--获取spring security 需要的用户权限信息-->
+       <!-- <authentication-provider>
+            &lt;!&ndash;获取spring security 需要的用户权限信息&ndash;&gt;
             <jdbc-user-service data-source-ref="dataSource"
                 users-by-username-query="SELECT username, password, IF(status is null, 1, 0) AS enabled
                                          FROM tb_basic_user WHERE username = ?"
@@ -190,8 +192,46 @@ WHERE U.username = 'ADMIN'
                                                WHERE U.username = ?"
             />
 
-        </authentication-provider>
+        </authentication-provider>-->
+        <!--配置rememberme 认证管理器-->
+        <authentication-provider user-service-ref="userDetailsService"></authentication-provider>
+        <!--记住密码-->
+        <authentication-provider ref="rememberMeAuthenticationProvider"></authentication-provider>
+
     </authentication-manager>
+
+    <!--基于简单的加密方式实现remberme 配置UserDetailsService, 并加入到自定义过滤器-->
+    <beans:bean id="userDetailsService" class="org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl">
+        <!--查询用户-->
+        <beans:property name="usersByUsernameQuery"
+            value="SELECT username, password, IF(status is null, 1, 0) AS enabled
+                   FROM tb_basic_user WHERE username = ?"></beans:property>
+        <!--查询用户权限-->
+        <beans:property name="authoritiesByUsernameQuery"
+            value="SELECT U.username, R.rolelabel FROM tb_basic_role R
+                   LEFT JOIN tb_basic_userrole UR ON UR.roleid = R.id
+                   JOIN tb_basic_user U ON U.id = UR.userid
+                   WHERE U.username = ?"></beans:property>
+        <beans:property name="dataSource" ref="dataSource"></beans:property>
+    </beans:bean>
+    <!--rememberme 过滤器-->
+    <beans:bean id="rememberMeAuthenticationFilter" 
+                class="org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter">
+        <beans:constructor-arg name="authenticationManager" ref="authenticationManager"></beans:constructor-arg>
+        <beans:constructor-arg name="rememberMeServices" ref="rememberMeServices"></beans:constructor-arg>
+        
+    </beans:bean>
+
+    <beans:bean id="rememberMeServices" class="org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices">
+        <beans:constructor-arg name="key" value="rememberMe"></beans:constructor-arg>
+        <beans:constructor-arg name="userDetailsService" ref="userDetailsService"></beans:constructor-arg>
+        <beans:property name="cookieName" value="remember-me"></beans:property>
+    </beans:bean>
+
+    <beans:bean id="rememberMeAuthenticationProvider" class="org.springframework.security.authentication.RememberMeAuthenticationProvider">
+       <beans:constructor-arg name="key" value="rememberMe"></beans:constructor-arg>
+    </beans:bean>
+    
 
     <!--资源权限关系-->
     <beans:bean id="securityMetadataSource" class="com.ssmvue.security.MyFilterInvocationSecurityMetadataSource">
