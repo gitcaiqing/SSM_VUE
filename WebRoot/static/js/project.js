@@ -77,7 +77,7 @@ Vue = function(options) {
           cancelButtonText: '取消',
         })
         .then(function() {
-        	window.location.href = base + "/a/accountSet/logout";
+        	window.location.href = base + "/logout";
         });
 		
 	}

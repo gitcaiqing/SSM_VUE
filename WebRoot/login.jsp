@@ -40,19 +40,20 @@
                 j_username，输入登陆名的参数名称，j_password，输入密码的参数名称，这两个正常情况下也不会修改
             --%>
             <div class="ui-input">
-                <input class="abc" type="text" placeholder="请输入账号" name="username" value="${username}">
+                <input class="abc" type="text" placeholder="请输入账号" name="username" value="${username}" oninput="inputFocus(this)"/>
             </div>
             <div class="ui-input">
-                <input type="password" placeholder="请输入密码" name="password" value="${password}">
+                <input type="password" placeholder="请输入密码" name="password" value="${password}" oninput="inputFocus(this)"/>
+            </div>
+                <div class="ui-input">记住我 <input type="checkbox" name="remember-me" value="true"/></div>
+            <div class="ui-input">
+                <input type="text" placeholder="请输入验证码" name="captcha" style="float:left;width:75%" oninput="inputFocus(this)"/>
+                <img src="${base}/captchaServlet"  id="refresh-code" style="float:right"/>
             </div>
 
-            <%--<div class="ui-input" style="border:none">
-                <input type="text" placeholder="请输入验证码" name="captcha" style="float:left;width:75%" onfocus="inputFocus(this)"/>
-                <img src="${base}/captchaServlet"  id="refresh-code" style="float:right"/>
-            </div>--%>
             <div style="clear:both"></div>
             <button type="submit" class="ui-button ui-button--primary" style="background-color:#409eff;margin-bottom:20px">登录</button>
-            <div style="color:#E6A23C" id="message">${login_message}</div>
+            <div style="color:#E6A23C" id="message">${sessionScope.errorMsg}</div>
         </div>
     </form>
 </div>
@@ -66,7 +67,7 @@
     });
     function inputFocus(obj) {
         var $this = $(obj);
-        //$("#message").html("");
+        $("#message").html("");
     }
 </script>
 </html>
