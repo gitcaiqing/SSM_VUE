@@ -13,9 +13,21 @@
 			classpath*:spring/dataAccessContext.xml,
 			classpath*:spring/mybatis.xml,
 			classpath*:spring/spring-jpa.xml,
-			classpath*:spring/spring-security.xml
+			classpath*:spring/spring-security.xml,
+            classpath*:spring/spring-session-mongodb
  		</param-value> 
    	</context-param>
+
+	<!-- 添加一个session代理filter，通过这个filter来包装Servlet的getSession()。将配置放置到最前面，让其具有最优先地位 -->
+	<filter>
+		<filter-name>springSessionRepositoryFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>springSessionRepositoryFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
  	<!-- Spring监听器 -->
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
@@ -27,7 +39,10 @@
 	<listener>
         <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
     </listener>
-    <!-- 编码过滤器 -->  
+
+
+
+	<!-- 编码过滤器 -->
 	<filter>
 		<filter-name>encodingFilter</filter-name>
 		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>

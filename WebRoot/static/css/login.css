@@ -4,8 +4,8 @@ body { font-size: 14px; -webkit-font-smoothing: antialiased; }
 a { text-decoration: none; }
 
 /* ui */
-.ui-input { position: relative; padding: 15px 0; border-bottom: 1px solid #dfe6e5; font-size: 0; }
-.ui-input input { width: 100%; height: 30px; border: 0; font-size: 14px; outline: none; }
+.ui-input { position: relative; padding: 15px 0; border-bottom: 1px solid #dfe6e5; /*font-size: 0;*/ }
+.ui-input input { /*width: 100%;*/ height: 30px; border: 0; font-size: 16px; outline: none; }
 
 .ui-button { height: 40px; border: 0; font-size: 14px; outline: none; cursor: pointer; }
 .ui-button--primary { color: #fff; background-color: #a6aaad; }

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+                           http://www.springframework.org/schema/tx
+                           http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+                           http://www.springframework.org/schema/aop
+                           http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context-4.0.xsd
+                           http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo-1.8.xsd">
+
+    <!-- 设置使用注解的类所在的jar包 -->
+    <context:component-scan base-package="com.ssmvue.*" />
+
+    <!--连接mongodb start-->
+
+    <!-- 方式1：mongodb 无用户密码 -->
+    <!-- <mongo:mongo id="mongo" host="192.168.100.104" port="27017" />
+    <mongo:db-factory dbname="SSM_VUE" mongo-ref="mongo" />
+
+    <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+        <constructor-arg name="mongoDbFactory" ref="mongoDbFactory" />
+    </bean> -->
+
+
+    <!-- 方式2：mongodb 含用户密码-->
+    <!-- <mongo:mongo id="mongo" host="192.168.100.104" port="27017" />
+    <mongo:db-factory dbname="SSM_VUE" mongo-ref="mongo" />
+
+    <bean id="userCredentials" class="org.springframework.data.authentication.UserCredentials">
+        <constructor-arg name="username" value="" />
+        <constructor-arg name="password" value="" />
+    </bean>
+
+    <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+        <constructor-arg name="mongo" ref="mongo" />
+        <constructor-arg name="databaseName" value="SSM_VUE"></constructor-arg>
+        <constructor-arg name="userCredentials" ref="userCredentials" />
+    </bean> -->
+
+    <!-- 方式3：复制集 -->
+    <mongo:mongo id="mongo" replica-set="192.168.100.104:27017">
+        <mongo:options connections-per-host="50"
+                       write-number="1"
+                       write-timeout="0"
+                       write-fsync="true"/>
+    </mongo:mongo>
+
+    <bean id="userCredentials" class="org.springframework.data.authentication.UserCredentials">
+        <constructor-arg name="username" value="" />
+        <constructor-arg name="password" value="" />
+    </bean>
+
+    <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+        <constructor-arg name="mongo" ref="mongo" />
+        <constructor-arg name="databaseName" value="SSM_VUE" />
+        <constructor-arg name="userCredentials" ref="userCredentials"/>
+    </bean>
+
+    <!--连接mongodb end-->
+
+
+    <!-- 将session放入Mongo -->
+    <!-- 在web.xml文件中添加一个session代理filter，通过这个filter来包装Servlet的getSession()-->
+    <bean id="mongoHttpSessionConfiguration"
+          class="org.springframework.session.data.mongo.config.annotation.web.http.MongoHttpSessionConfiguration">
+        <property name="maxInactiveIntervalInSeconds" value="1800" />
+        <property name="mongoSessionConverter" ref="jdkMongoSessionConverter"></property>
+        <property name="collectionName" value="spring_sessions"></property>
+    </bean>
+
+    <bean id="jdkMongoSessionConverter" class="org.springframework.session.data.mongo.JdkMongoSessionConverter"></bean>
+
+    <!-- cookie的配置 -->
+    <bean id="cookieSerializer" class="org.springframework.session.web.http.DefaultCookieSerializer">
+        <property name="cookieName" value="CUSTOM_JSESSIONID" />
+        <property name="domainNamePattern" value="^.+?\\.(\\w+\\.[a-z]+)$"></property>
+        <property name="cookiePath" value="/"></property>
+    </bean>
+
+</beans>
