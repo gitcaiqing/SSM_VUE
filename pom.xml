@@ -15,7 +15,7 @@
         <springsecurity.version>4.0.1.RELEASE</springsecurity.version>
         <spring-session.version>1.3.1.RELEASE</spring-session.version>
         <jackson.version>2.5.0</jackson.version>
-        <shiro.version>1.2.3</shiro.version>
+        <shiro.version>1.5.0</shiro.version>
     </properties>
 
     <dependencies>
@@ -292,17 +292,17 @@
         <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-core</artifactId>
-            <version>1.2.3</version>
+            <version>1.5.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-web</artifactId>
-            <version>1.2.3</version>
+            <version>1.5.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-spring</artifactId>
-            <version>1.2.3</version>
+            <version>1.5.0</version>
         </dependency>
 
         <!-- 对象存储 -->
